@@ -8,58 +8,9 @@ GITLINT=/usr/local/bin/gitlint
 GITLINTCFG=$GL_ADMIN_BASE/local/hooks/gitlint.cfg
 LOCAL_GITLINTCFG=.gitlint.cfg
 
+FUNCTIONS="gitlint-functions.sh"
 
-isFeatureBranch()
-{
-    refname="$1"
-
-    shortname=$($GIT rev-parse --symbolic --abbrev-ref $refname 2>/dev/null)
-
-    if [ $? != 0 ]; then
-        echo false
-        return
-    fi
-
-    case "$shortname" in
-        */*)
-            echo true
-            return
-            ;;
-        *)
-            ;;
-    esac
-    echo false
-
-}
-
-
-getGitlintCfg()
-{
-    TMPFILE=/tmp/gitlint.cfg.$$
-    $GIT cat-file blob $newrev:$LOCAL_GITLINTCFG > $TMPFILE 2> /dev/null
-    if [ $? != 0 ]; then
-        rm -f $TMPFILE
-        echo $GITLINTCFG
-    else
-        echo $TMPFILE
-    fi
-} 
-
-cleanupGitlintCfg()
-{
-    TMPFILE=/tmp/gitlint.cfg.$$
-    rm -f $TMPFILE
-}
-
-buildJiraRegexp()
-{
-    HOOKJIRAPROJECT=$($GIT config hook.jira-project)
-    if [ -z "$HOOKJIRAPROJECT" ]; then
-        return
-    fi
-
-    echo "\b$HOOKJIRAPROJECT\b-\d+\b"
-}
+. $FUNCTIONS
 
 
 validate_ref()
@@ -132,7 +83,7 @@ validate_ref()
 HOOKGITLINT=$($GIT config --bool hook.gitlint)
 HOOKIGNOREFEATURE=$($GIT config --bool hook.gitlint-ignore-feature-branches)
 
-if [ "false" -eq "$HOOKGITLINT" -o -z "$HOOKGITLINT" ];
+if [ "false" == "$HOOKGITLINT" -o -z "$HOOKGITLINT" ];
    exit 0;
 fi
 
@@ -141,7 +92,7 @@ FAIL="0"
 while read OLD_REVISION NEW_REVISION REFNAME
 do
     FEATUREBRANCH=$(isFeatureBranch $REFNAME)
-    if [ "true" -eq "$HOOKIGNOREFEATURE" -a "true" -eq "$FEATUREBRANCH" ];
+    if [ "true" == "$HOOKIGNOREFEATURE" -a "true" == "$FEATUREBRANCH" ];
         echo "ignoring gitlint hook on feature branch"
         continue
     fi
