@@ -46,7 +46,7 @@ validate_ref()
                 return
             fi
 
-            CFG=$( getGitlintCfg )
+            CFG=$( getGitlintCfg $newrev )
 
             # Get all commits, loop over and check if the comments are valid
             while read REVISION ; do
