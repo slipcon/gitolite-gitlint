@@ -1,0 +1,4 @@
+PROJ short title
+
+this is the body for the commit with the jira project name but no
+number

@@ -1,0 +1,3 @@
+short title
+
+this is the body for the commit without the jira key
